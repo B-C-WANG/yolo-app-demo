@@ -4,6 +4,8 @@ import json
 import numpy as np
 import time
 
+from aiCore import AICore
+
 def tst_send_normal_websocket_message():
     # 测试websocket发送简单消息
 
@@ -36,6 +38,7 @@ def tst_send_json():
             print("send:")
 
     start_server = websockets.serve(hello, '10.10.9.128', 8080)
+
     asyncio.get_event_loop().run_until_complete(start_server)
     asyncio.get_event_loop().run_forever()
 
@@ -45,7 +48,7 @@ def tst_got_image_and_give_fake_result():
     :return:
     '''
 
-
+    model = AICore()
     async def hello(websocket, path):
         # TODO: 这里开另一个线程处理image然后send
 
@@ -60,13 +63,15 @@ def tst_got_image_and_give_fake_result():
             '''
 
             msg = msg.split(",")
-            image = np.array(msg).astype(np.int)
+            image = np.array(msg).astype(np.uint8)
             image = image.reshape(256,256,3)
-            print(image.shape)
-            time.sleep(1)
+            model.detect_img(image)
 
 
-    start_server = websockets.serve(hello, '10.10.9.128', 8080)
+
+
+    # 虚拟机中的ip,需要ifconfig查看
+    start_server = websockets.serve(hello, '10.10.9.168', 8080)
     asyncio.get_event_loop().run_until_complete(start_server)
     asyncio.get_event_loop().run_forever()
 

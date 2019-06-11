@@ -112,9 +112,9 @@ class YOLO(object):
             boxed_image = letterbox_image(image, new_image_size)
         image_data = np.array(boxed_image, dtype='float32')
 
-        print(image_data.shape)
         image_data /= 255.
         image_data = np.expand_dims(image_data, 0)  # Add batch dimension.
+
 
         out_boxes, out_scores, out_classes = self.sess.run(
             [self.boxes, self.scores, self.classes],
@@ -125,8 +125,12 @@ class YOLO(object):
             })
 
         print('Found {} boxes for {}'.format(len(out_boxes), 'img'))
+        endTime1 = timer()
+        print("Model run time:",endTime1-start)
 
-        font = ImageFont.truetype(font='./font/FiraMono-Medium.otf',
+        # TODO:修改这里后面的
+
+        font = ImageFont.truetype(font='./kerasYolo3/font/FiraMono-Medium.otf',
                     size=np.floor(3e-2 * image.size[1] + 0.5).astype('int32'))
         thickness = (image.size[0] + image.size[1]) // 300
 

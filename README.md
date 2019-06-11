@@ -4,6 +4,7 @@
 # 运行
 - 首先运行py_webserver服务
 - 然后使用Hbuilder打开项目，双击index.html，然后运行到浏览器
+- 测试完成之后运行到手机,用于获取摄像头数据处理!
 
 # 开发流程
 ## 通信和序列化
@@ -21,9 +22,12 @@
 - aiCore.py中的代码参考yolo_video中的detect_img来完成,对接webserver
 - 需要对keras-yolo3仓库代码进行的改动:原来的yolo是直接输出加了mask和bounding box的图像,可以选择直接把图像矩阵传给js,也可以选择把分类结果和bounding box坐标传给js进行绘制
 - 如果传图片,通信开销较大,如果只是传分类结果和bounding box而没有mask,相对开销较小(注意mask也是矩阵,并且是分层的,所以传递mask不如直接传结果图片)
-
+## app打包
 ## debug
 - 传递yolo所需的标准图片大小416,416,3时,出现websocket大小超出size的错误,尝试采用更小的图片,yolo中会进行resize
+- 传输较大的图片可以采用传送多次来完成,每次json对象中设置好index
+- 如果是context2d通过getImage方法获得,结果的数据类型是Uint8ClampedArray,这个可以尝试直接发送给python解析,并未实现,因此转成普通数组.另外传递过去的一位数组是H*W*4的,应该是rgba的
+- 传入图片一直没有判定出box:先用图片进行debug,正常后,尝试摄像头远景,或者摄像头识别电脑中图片,注意保持长宽比,不要拉伸压缩
 
 
 

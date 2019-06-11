@@ -23,5 +23,14 @@ class AICore(object):
         self.yolo.detect_image(img)
         print("Finished detect img")
 
+    def test_example_img(self):
+        img = Image.open("./exampleImg.jpeg")
+        img = img.resize((320,210))
+
+        self.yolo.detect_image(img).show()
+
+
+
 if __name__ == '__main__':
     tst = AICore()
+    tst.test_example_img()

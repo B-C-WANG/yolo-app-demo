@@ -64,7 +64,8 @@ def tst_got_image_and_give_fake_result():
 
             msg = msg.split(",")
             image = np.array(msg).astype(np.uint8)
-            image = image.reshape(256,256,3)
+            # 得到的是4通道的数据!因为rgba
+            image = image.reshape(224,320,4)[:,:,:-1]
             model.detect_img(image)
 
 

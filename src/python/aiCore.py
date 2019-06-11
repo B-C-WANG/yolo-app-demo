@@ -27,7 +27,9 @@ class AICore(object):
         img = Image.open("./exampleImg.jpeg")
         img = img.resize((320,210))
 
-        self.yolo.detect_image(img).show()
+        result = self.yolo.detect_image(img)
+        print(result)
+        return result
 
 
 

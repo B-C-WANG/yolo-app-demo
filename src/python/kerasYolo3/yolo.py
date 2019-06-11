@@ -128,8 +128,42 @@ class YOLO(object):
         endTime1 = timer()
         print("Model run time:",endTime1-start)
 
-        # TODO:修改这里后面的
+        output = dict()
+        output["data"] = []
+        for i, c in reversed(list(enumerate(out_classes))):
+            predicted_class = self.class_names[c]
+            box = out_boxes[i]
+            score = out_scores[i]
 
+            label = '{} {:.2f}'.format(predicted_class, score)
+
+            top, left, bottom, right = box
+
+            top = max(0, np.floor(top + 0.5).astype('int32'))
+            left = max(0, np.floor(left + 0.5).astype('int32'))
+            bottom = min(image.size[1], np.floor(bottom + 0.5).astype('int32'))
+            right = min(image.size[0], np.floor(right + 0.5).astype('int32'))
+            # 最终输出所需要的
+            print(label, (left, top), (right, bottom))
+
+            output["data"].append({
+                "label":label,
+                "left":left,
+                "top":top,
+                'right':right,
+                "bottom":bottom
+            })
+        # 最终输出字典
+        return output
+
+
+        end = timer()
+        print(end - start)
+        return image
+
+
+
+        # 下面是原来输出的代码
         font = ImageFont.truetype(font='./kerasYolo3/font/FiraMono-Medium.otf',
                     size=np.floor(3e-2 * image.size[1] + 0.5).astype('int32'))
         thickness = (image.size[0] + image.size[1]) // 300

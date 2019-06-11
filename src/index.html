@@ -5,12 +5,19 @@
     <meta name="viewport"
           content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no"/>
     <title></title>
-    <script src="libs/mui.min.js"></script>
-    <!-- 引入protobuf库 -->
-    <script src="js/main.js"></script>
+
 
 </head>
 <body>
+<div id="camera" style="width: 100vw;height: 50vh;">
+    <!--video没有必要显示，只是为了提供image，所以可以hidden-->
+    <video id="video" hidden="">
+    </video>
+    <canvas id="canvas" width="480" height="320"></canvas>
+</div>
 
 </body>
+<script src="libs/mui.min.js"></script>
+<!-- 引入protobuf库 -->
+<script src="js/main.js"></script>
 </html>

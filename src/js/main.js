@@ -111,7 +111,11 @@ class VideoStream {
                 let dataArray = imageData.data;
                 // 得到的数据是imageW * imageH * 4的，数据类型是Uint8ClampedArray，可以尝试直接python解析这个结果，这里是转成普通的array解析
                 let normalArray = Array.from(Array.prototype.slice.call(dataArray));
-                websocket.ws.send(normalArray);
+                if(websocket.ws.readyState === 1){
+                    //添加状态判断，当为OPEN时，发送消息
+                    websocket.ws.send(normalArray);
+
+                }
 
             },
             interval
@@ -156,49 +160,85 @@ class VideoStream {
 
 
 // // -----------主函数-------------
+var ip,port;
+var is_ip_set = false;
+var is_port_set = false;
+var main_runned = false;
+mui.plusReady(function () {
+// 注意，浏览器不支持plusReady函数，因此不会执行，浏览器上使用请删除plusReady以及下面的API调用！
+    mui.prompt('server ip:', '','', function (e) {
+        if (e.index === 1) {
+            ip = e.value;
+            is_ip_set = true;
+        }
+    });
+    mui.prompt('server port:', '','', function (e) {
+        if (e.index === 1) {
+            port = parseInt(e.value);
+            is_port_set = true;
+        }
+    });
 
+});
 
-let ip = '10.10.9.168';
-let port = 8080;
-let imageW = 192;
-let imageH = 192;
+setInterval(function () {
+    console.log("Check");
+    console.log(is_ip_set);
+    console.log(is_port_set);
+    // 每间隔1s检查ip port是否设置了，设置了就处理
+    if (is_ip_set && is_port_set) {
+        console.log(ip);
+        console.log(port);
+        if (main_runned){
+            // 如果主函数run过一遍就不需要再次进行了
+            return;
+        }
+        main_runned = true;
 
-let video1 = document.getElementById('video');
-let canvas = document.getElementById('canvas');
-var websocket = new WebsocketTools(ip, port);
-websocket.createWebsocket();
+        // var ip = '10.10.9.168';
+        // var port = 8080;
+        let imageW = 192;
+        let imageH = 192;
 
-var vs = new VideoStream(
-    video1,
-    canvas.getContext('2d'),
-    // 注意下面的参数要和python那边统一
-    imageW,
-    imageH,
-    websocket);
-vs.start();
-// 根据机器性能设置interval
-vs.startProcess(250);
+        let video1 = document.getElementById('video');
+        let canvas = document.getElementById('canvas');
+        var websocket = new WebsocketTools(ip, port);
+        websocket.createWebsocket();
 
-// 重载onmessage函数，因为需要调用videoStream画出矩形框
-websocket.ws.onmessage = function (message) {
-    let obj = JSON.parse(message.data);
-    for (let i = 0; i < obj.data.length; i++) {
-        let label = obj.data[i].label;
-        let left = obj.data[i].left;
-        let right = obj.data[i].right;
-        let top = obj.data[i].top;
-        let bottom = obj.data[i].bottom;
+        var vs = new VideoStream(
+            video1,
+            canvas.getContext('2d'),
+            // 注意下面的参数要和python那边统一
+            imageW,
+            imageH,
+            websocket);
+        vs.start();
+        // 根据机器性能设置interval
+        vs.startProcess(250);
 
-        //边框颜色
-        vs.context2d.strokeStyle = "#51c1ff";
-        vs.context2d.lineWidth = 4;
-        vs.context2d.strokeRect(x=left,y=top,w=Math.abs(right-left),h=Math.abs(bottom-top));
-        vs.context2d.fillText(label,left,top);
+        // 重载onmessage函数，因为需要调用videoStream画出矩形框
+        websocket.ws.onmessage = function (message) {
+            let obj = JSON.parse(message.data);
+            for (let i = 0; i < obj.data.length; i++) {
+                let label = obj.data[i].label;
+                let left = obj.data[i].left;
+                let right = obj.data[i].right;
+                let top = obj.data[i].top;
+                let bottom = obj.data[i].bottom;
 
+                //边框颜色
+                vs.context2d.strokeStyle = "#51c1ff";
+                vs.context2d.lineWidth = 4;
+                vs.context2d.strokeRect(x = left, y = top, w = Math.abs(right - left), h = Math.abs(bottom - top));
+                vs.context2d.fillText(label, left, top);
+
+            }
+
+        };
     }
 
+}, 1000);
 
-};
 
 // setInterval(
 //     function () {

@@ -157,20 +157,28 @@ class VideoStream {
 
 // // -----------主函数-------------
 
+
+let ip = '10.10.9.168';
+let port = 8080;
+let imageW = 192;
+let imageH = 192;
+
 let video1 = document.getElementById('video');
 let canvas = document.getElementById('canvas');
-var websocket = new WebsocketTools('10.10.9.168', 8080);
+var websocket = new WebsocketTools(ip, port);
 websocket.createWebsocket();
 
 var vs = new VideoStream(
     video1,
     canvas.getContext('2d'),
     // 注意下面的参数要和python那边统一
-    192,
-    192,
+    imageW,
+    imageH,
     websocket);
 vs.start();
-vs.startProcess();
+// 根据机器性能设置interval
+vs.startProcess(250);
+
 // 重载onmessage函数，因为需要调用videoStream画出矩形框
 websocket.ws.onmessage = function (message) {
     let obj = JSON.parse(message.data);

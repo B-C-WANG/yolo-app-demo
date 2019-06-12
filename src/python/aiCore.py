@@ -20,8 +20,8 @@ class AICore(object):
         # TODO: yolo传入的是cv2的image,而不是array!
         img = Image.fromarray(image_array)
 
-        self.yolo.detect_image(img)
-        print("Finished detect img")
+        return self.yolo.detect_image(img)
+        #print("Finished detect img")
 
     def test_example_img(self):
         img = Image.open("./exampleImg.jpeg")

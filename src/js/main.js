@@ -22,6 +22,7 @@ class WebsocketTools {
         // 可以理解为let this = this
         this.ws.onmessage = function (message) {
 
+            // 这个函数会在主函数中重载
 
             // 这一段对应于python的tst send json
             // console.log(message);
@@ -29,7 +30,16 @@ class WebsocketTools {
             // console.log(obj.got);
             // console.log(obj.message);
 
-            // 这里对应于python的tst_got_image_and_give_fake_result
+            // 这里对应于python的tst_got_image
+            // 处理结果，打印
+            // let obj = JSON.parse(message.data);
+            // for (let i=0;i<obj.data.length;i++){
+            //     console.log(obj.data[i].label);
+            //     console.log(obj.data[i].left);
+            //     console.log(obj.data[i].right);
+            //     console.log(obj.data[i].top);
+            //     console.log(obj.data[i].bottom);
+            // }
 
         };
         this.ws.onopen = function () {
@@ -84,7 +94,7 @@ class VideoStream {
         }
     }
 
-    startProcess(interval = 1000) {
+    startProcess(interval = 250) {
         //因为在callback中不支持this，所以需要二次赋值
         let context2d = this.context2d;
         let video = this.video;
@@ -130,7 +140,13 @@ class VideoStream {
 
         if (navigator.mediaDevices.getUserMedia || navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia) {
             //调用用户媒体设备, 访问摄像头
-            VideoStream.getUserMedia({video: {width: 480, height: 320}}, onSuccess, onError);
+            VideoStream.getUserMedia({
+                video: {
+                    width: this.imageW,
+                    height: this.imageH,
+                    facingMode: {exact: "environment"}
+                }
+            }, onSuccess, onError);
         } else {
             alert('不支持访问用户媒体');
         }
@@ -151,12 +167,30 @@ var vs = new VideoStream(
     canvas.getContext('2d'),
     // 注意下面的参数要和python那边统一
     192,
-    288,
+    192,
     websocket);
 vs.start();
 vs.startProcess();
+// 重载onmessage函数，因为需要调用videoStream画出矩形框
+websocket.ws.onmessage = function (message) {
+    let obj = JSON.parse(message.data);
+    for (let i = 0; i < obj.data.length; i++) {
+        let label = obj.data[i].label;
+        let left = obj.data[i].left;
+        let right = obj.data[i].right;
+        let top = obj.data[i].top;
+        let bottom = obj.data[i].bottom;
+
+        //边框颜色
+        vs.context2d.strokeStyle = "#51c1ff";
+        vs.context2d.lineWidth = 4;
+        vs.context2d.strokeRect(x=left,y=top,w=Math.abs(right-left),h=Math.abs(bottom-top));
+        vs.context2d.fillText(label,left,top);
+
+    }
 
 
+};
 
 // setInterval(
 //     function () {

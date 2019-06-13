@@ -80,4 +80,5 @@ class WebServer(object):
 if __name__ == '__main__':
     #tst_send_normal_websocket_message()
     #tst_send_json()
-    WebServer.launch(ip='10.10.9.168',port=8080,imageW=192,imageH=192)
+    #WebServer.launch(ip='10.10.9.168',port=8080,imageW=192,imageH=192)
+    WebServer.launch(ip='10.20.192.26',port=8080,imageW=192,imageH=192)
